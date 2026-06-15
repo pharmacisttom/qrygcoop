@@ -126,13 +126,16 @@
         <div class="logo-box">
             <div class="logo-icon">👩‍💻</div>
             <h5 class="fw-bold mb-0">ระบบจัดการคิว</h5>
-            <small>ช่องบริการที่ 1</small>
+            <small id="adminNameDisplay">กำลังตรวจสอบ...</small>
         </div>
         <div class="nav-item active">📋 จัดการคิววันนี้</div>
         <div class="nav-item">📊 Dashboard สถิติ</div>
         <div class="nav-item">⚙️ ตั้งค่าระบบ</div>
         
         <div class="mt-auto text-center">
+            <button class="btn btn-sm btn-outline-light w-100 mb-3" onclick="logout()" style="border-radius: 12px; font-weight: 500;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right me-1" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/><path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg> ออกจากระบบ
+            </button>
             <small style="opacity: 0.7;">Digital Cooperative v1.0</small>
         </div>
     </div>
@@ -177,6 +180,32 @@
     </div>
 
     <script>
+        // 1. ตรวจสอบการ Login ก่อนโหลดข้อมูลอื่นๆ
+        const sessionStr = localStorage.getItem('admin_session');
+        if (!sessionStr) {
+            window.location.href = 'login.html';
+        } else {
+            const session = JSON.parse(sessionStr);
+            document.getElementById('adminNameDisplay').innerText = 'เจ้าหน้าที่: ' + session.fullname;
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'ยืนยันออกจากระบบ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'ออกจากระบบ',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('admin_session');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
         // ตั้งค่าวันที่
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('currentDate').innerText = new Date().toLocaleDateString('th-TH', options);

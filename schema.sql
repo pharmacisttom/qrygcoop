@@ -3,6 +3,24 @@
 -- ลบตารางเดิมและ policy เดิมออกก่อน (เผื่อมีการรันสคริปต์ซ้ำ)
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS queues CASCADE;
+DROP TABLE IF EXISTS staff_users CASCADE;
+
+-- 0. สร้างตารางเก็บรหัสผ่านเจ้าหน้าที่
+CREATE TABLE staff_users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL, -- เก็บเป็น Plain text สำหรับทดสอบ
+    fullname VARCHAR(150) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- ใส่ข้อมูลตั้งต้นสำหรับแอดมิน (admin / admin1234)
+INSERT INTO staff_users (username, password, fullname) VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบ');
+
+-- เปิดใช้งาน RLS สำหรับตาราง staff_users
+ALTER TABLE staff_users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow anonymous select for staff_users" ON staff_users FOR SELECT USING (true);
+
 
 -- 1. สร้างตารางเก็บรายการคิว (Queues)
 CREATE TABLE queues (
