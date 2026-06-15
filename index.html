@@ -241,7 +241,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbXRncmxhdnp3a2poZnZha3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDQxMTUsImV4cCI6MjA5NzA4MDExNX0._csVd8NZjCgzYACeCOPIbXY_NEZ3z9iPFIh2DneGbzQ';
         const GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyaAFPx3UzxiPzHyXZN2vlbUXzwVbc0MrLMfFkF6TMwPjRx-Pw1Y5-scKnXYXBjVserUw/exec';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentUser = { userId: 'U12345mock', displayName: 'สมชาย รักเกียรติ', pictureUrl: 'https://ui-avatars.com/api/?name=สมชาย' };
 
@@ -300,7 +300,7 @@
 
             try {
                 // 1. Save to Supabase
-                const { data, error } = await supabase.from('queues').insert([{
+                const { data, error } = await supabaseClient.from('queues').insert([{
                     queue_number: qNum,
                     user_id: currentUser.userId,
                     user_name: currentUser.displayName,

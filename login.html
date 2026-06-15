@@ -115,7 +115,7 @@
     <script>
         const SUPABASE_URL = 'https://mimtgrlavzwkjhfvakug.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbXRncmxhdnp3a2poZnZha3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDQxMTUsImV4cCI6MjA5NzA4MDExNX0._csVd8NZjCgzYACeCOPIbXY_NEZ3z9iPFIh2DneGbzQ';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // เช็คว่ามี session อยู่แล้วหรือไม่
         window.onload = () => {
@@ -142,7 +142,7 @@
 
             try {
                 // ค้นหาผู้ใช้ใน Supabase (ใช้ตาราง staff_users)
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('staff_users')
                     .select('*')
                     .eq('username', username)

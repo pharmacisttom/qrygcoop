@@ -215,11 +215,11 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbXRncmxhdnp3a2poZnZha3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDQxMTUsImV4cCI6MjA5NzA4MDExNX0._csVd8NZjCgzYACeCOPIbXY_NEZ3z9iPFIh2DneGbzQ';
         const GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyaAFPx3UzxiPzHyXZN2vlbUXzwVbc0MrLMfFkF6TMwPjRx-Pw1Y5-scKnXYXBjVserUw/exec';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function fetchQueues() {
             const today = new Date().toISOString().split('T')[0];
-            const { data, error } = await supabase.from('queues').select('*').eq('booking_date', today).order('id', { ascending: true });
+            const { data, error } = await supabaseClient.from('queues').select('*').eq('booking_date', today).order('id', { ascending: true });
             if (!error) renderTable(data);
         }
 
@@ -279,7 +279,7 @@
 
                     try {
                         // 1. Update Supabase
-                        await supabase.from('queues').update({ status: newStatus }).eq('id', id);
+                        await supabaseClient.from('queues').update({ status: newStatus }).eq('id', id);
                         
                         // 2. Webhook to GAS
                         await fetch(GAS_WEBHOOK_URL, {
