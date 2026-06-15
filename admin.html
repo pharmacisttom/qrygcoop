@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการคิว (Admin) | สหกรณ์ออมทรัพย์สาธารณสุขระยอง</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Sarabun -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #0d6efd, #198754);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .logo-box {
+            text-align: center;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logo-icon {
+            font-size: 40px;
+            background: rgba(255,255,255,0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .table-custom {
+            margin-bottom: 0;
+        }
+        
+        .table-custom th {
+            border-top: none;
+            color: #6c757d;
+            font-weight: 600;
+            padding: 15px 20px;
+            background: #f8f9fa;
+        }
+
+        .table-custom td {
+            padding: 15px 20px;
+            vertical-align: middle;
+        }
+
+        .btn-call {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px;
+            padding: 6px 15px;
+            font-size: 0.9rem;
+        }
+        .btn-call:hover { background-color: #0b5ed7; color: white; }
+
+        .btn-finish {
+            background-color: #198754;
+            color: white;
+            border-radius: 10px;
+            padding: 6px 15px;
+            font-size: 0.9rem;
+        }
+        .btn-finish:hover { background-color: #157347; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-box">
+            <div class="logo-icon">👩‍💻</div>
+            <h5 class="fw-bold mb-0">ระบบจัดการคิว</h5>
+            <small>ช่องบริการที่ 1</small>
+        </div>
+        <div class="nav-item active">📋 จัดการคิววันนี้</div>
+        <div class="nav-item">📊 Dashboard สถิติ</div>
+        <div class="nav-item">⚙️ ตั้งค่าระบบ</div>
+        
+        <div class="mt-auto text-center">
+            <small style="opacity: 0.7;">Digital Cooperative v1.0</small>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-primary mb-1">จัดการคิวรอรับบริการ</h3>
+                <div class="text-muted" id="currentDate">กำลังโหลด...</div>
+            </div>
+            <button class="btn btn-outline-primary" style="border-radius: 12px; font-weight: 500;" onclick="fetchQueues()">
+                ↻ รีเฟรชข้อมูล
+            </button>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+                <h5 class="fw-bold mb-0">รายการคิวทั้งหมดในระบบ</h5>
+            </div>
+            <div class="card-body p-0 mt-3">
+                <div class="table-responsive">
+                    <table class="table table-custom table-hover">
+                        <thead>
+                            <tr>
+                                <th>หมายเลขคิว</th>
+                                <th>ชื่อ-สกุลสมาชิก</th>
+                                <th>บริการ</th>
+                                <th>เวลานัดหมาย</th>
+                                <th>สถานะ</th>
+                                <th>การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="queueTableBody">
+                            <tr><td colspan="6" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ตั้งค่าวันที่
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('th-TH', options);
+
+        // CONFIGURATION
+        const SUPABASE_URL = 'https://mimtgrlavzwkjhfvakug.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbXRncmxhdnp3a2poZnZha3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDQxMTUsImV4cCI6MjA5NzA4MDExNX0._csVd8NZjCgzYACeCOPIbXY_NEZ3z9iPFIh2DneGbzQ';
+        const GAS_WEBHOOK_URL = 'YOUR_GAS_WEBAPP_URL';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function fetchQueues() {
+            const today = new Date().toISOString().split('T')[0];
+            const { data, error } = await supabase.from('queues').select('*').eq('booking_date', today).order('id', { ascending: true });
+            if (!error) renderTable(data);
+        }
+
+        function renderTable(queues) {
+            const tbody = document.getElementById('queueTableBody');
+            tbody.innerHTML = '';
+            
+            if(queues.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">ไม่มีคิวในวันนี้</td></tr>';
+                return;
+            }
+
+            queues.forEach(q => {
+                let statusBadge = '';
+                let actionBtn = '';
+                
+                if (q.status === 'WAITING') {
+                    statusBadge = '<span class="badge bg-warning text-dark px-3 py-2" style="border-radius: 10px;">รอเรียกคิว</span>';
+                    actionBtn = `<button class="btn btn-call fw-bold" onclick="updateStatus(${q.id}, '${q.user_id}', 'CALLING', '${q.queue_number}')">เรียกคิว</button>`;
+                } else if (q.status === 'CALLING') {
+                    statusBadge = '<span class="badge bg-primary px-3 py-2" style="border-radius: 10px;">กำลังให้บริการ</span>';
+                    actionBtn = `<button class="btn btn-finish fw-bold" onclick="updateStatus(${q.id}, '${q.user_id}', 'DONE', '${q.queue_number}')">ปิดงาน</button>`;
+                } else if (q.status === 'DONE') {
+                    statusBadge = '<span class="badge bg-success px-3 py-2" style="border-radius: 10px;">เสร็จสิ้น</span>';
+                    actionBtn = `<span class="text-muted small">จบกระบวนการ</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong class="text-primary fs-5">${q.queue_number}</strong></td>
+                        <td class="fw-medium">${q.user_name}</td>
+                        <td>${q.service_type}</td>
+                        <td>${q.booking_time} น.</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionBtn}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function updateStatus(id, userId, newStatus, qNum) {
+            const actionText = newStatus === 'CALLING' ? 'เรียกคิว' : 'ปิดงาน (และส่งแบบประเมิน)';
+            
+            Swal.fire({
+                title: `ยืนยันการ${actionText}?`,
+                text: `หมายเลขคิว: ${qNum}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'ยืนยัน',
+                cancelButtonText: 'ยกเลิก'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    
+                    Swal.fire({ title: 'กำลังดำเนินการ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                    try {
+                        // 1. Update Supabase
+                        await supabase.from('queues').update({ status: newStatus }).eq('id', id);
+                        
+                        // 2. Webhook to GAS
+                        /*
+                        await fetch(GAS_WEBHOOK_URL, {
+                            method: 'POST', mode: 'no-cors',
+                            body: JSON.stringify({ action: 'notify_status_update', userId: userId, status: newStatus, queueId: id })
+                        });
+                        */
+                        
+                        Swal.fire({ icon: 'success', title: 'สำเร็จ', showConfirmButton: false, timer: 1000 });
+                        fetchQueues();
+
+                    } catch (e) {
+                        Swal.fire('ข้อผิดพลาด', e.message, 'error');
+                    }
+                }
+            });
+        }
+
+        window.onload = fetchQueues;
+    </script>
+</body>
+</html>
