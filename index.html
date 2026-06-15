@@ -2,342 +2,80 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จองคิวออนไลน์ | สหกรณ์ออมทรัพย์สาธารณสุขระยอง</title>
-    
+    <title>อยู่ระหว่างการจัดทำ | สหกรณ์ออมทรัพย์สาธารณสุขระยอง</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts: Sarabun -->
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- Supabase JS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- LIFF SDK -->
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #0d6efd, #198754);
             min-height: 100vh;
-            background: linear-gradient(135deg, #0d6efd, #198754);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px 0;
+            margin: 0;
+            padding: 20px;
         }
         
-        .main-card {
-            width: 100%;
-            max-width: 500px;
-            border: none;
-            border-radius: 28px;
-            box-shadow: 0 18px 45px rgba(0, 0, 0, .25);
+        .construction-card {
             background: white;
-            overflow: hidden;
-        }
-
-        .system-icon {
-            width: 76px;
-            height: 76px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, #0d6efd, #198754);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 38px;
-            margin: 0 auto 18px auto;
-            color: white;
-            box-shadow: 0 8px 15px rgba(13, 110, 253, 0.3);
-        }
-
-        .form-control, .form-select {
-            border-radius: 16px;
-            padding: 12px 15px;
-        }
-        
-        .btn-primary {
-            border-radius: 16px;
-            padding: 13px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #0d6efd, #198754);
-            border: none;
-            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4);
-        }
-
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        .time-slot {
+            border-radius: 28px;
+            padding: 40px;
             text-align: center;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 500;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .25);
+            max-width: 500px;
+            width: 100%;
         }
 
-        .time-slot.active {
-            background-color: #0d6efd;
-            color: white;
-            border-color: #0d6efd;
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
-        }
-
-        .profile-badge {
-            background: #f8fafc;
-            border: 1px solid #dbe4ef;
-            border-radius: 16px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
+        .icon-box {
+            font-size: 70px;
             margin-bottom: 20px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
         }
 
-        .profile-img {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            margin-right: 15px;
-            object-fit: cover;
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
         }
 
-        .status-view {
-            display: none;
-        }
-
-        .queue-box {
-            background: #f8fafc;
-            border: 2px dashed #0d6efd;
-            border-radius: 20px;
-            padding: 30px 20px;
-            margin: 20px 0;
-        }
-
-        .queue-number {
-            font-size: 3.5rem;
+        .title {
+            font-size: 1.8rem;
             font-weight: 700;
             color: #0d6efd;
-            line-height: 1;
+            margin-bottom: 15px;
+        }
+
+        .desc {
+            color: #6c757d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container px-3">
-        <div class="card main-card mx-auto" id="appCard">
-            <div class="card-body p-4 p-md-5">
-
-                <!-- Header -->
-                <div class="text-center mb-4">
-                    <div class="system-icon">📋</div>
-                    <h4 class="fw-bold text-primary mb-1">ระบบจองคิวออนไลน์</h4>
-                    <div class="text-muted">สหกรณ์ออมทรัพย์สาธารณสุขระยอง</div>
-                </div>
-
-                <!-- Booking Form -->
-                <div id="bookingFormView">
-                    
-                    <div class="profile-badge">
-                        <img src="https://ui-avatars.com/api/?name=User" class="profile-img" id="userImg">
-                        <div>
-                            <div class="fw-bold text-dark" id="userName">กำลังโหลด...</div>
-                            <div class="small text-muted">ผู้ใช้งาน LINE</div>
-                        </div>
-                    </div>
-
-                    <form id="bookingForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">ประเภทบริการ</label>
-                            <select id="serviceType" class="form-select" required>
-                                <option value="" disabled selected>-- เลือกประเภทบริการ --</option>
-                                <option value="ฝาก-ถอนเงิน">ฝาก-ถอนเงิน</option>
-                                <option value="ติดต่อสินเชื่อ">ติดต่อสินเชื่อ</option>
-                                <option value="สมัครสมาชิก">สมัครสมาชิก / เปลี่ยนแปลงข้อมูล</option>
-                                <option value="สอบถามทั่วไป">สอบถามข้อมูลทั่วไป</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">วันที่ต้องการรับบริการ</label>
-                            <input type="date" id="bookingDate" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">ช่วงเวลา (รอบละ 30 นาที)</label>
-                            <div class="time-slots" id="timeSlots">
-                                <div class="time-slot" onclick="selectTime(this, '09:00')">09:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '09:30')">09:30</div>
-                                <div class="time-slot" onclick="selectTime(this, '10:00')">10:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '10:30')">10:30</div>
-                                <div class="time-slot" onclick="selectTime(this, '11:00')">11:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '13:00')">13:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '13:30')">13:30</div>
-                                <div class="time-slot" onclick="selectTime(this, '14:00')">14:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '14:30')">14:30</div>
-                            </div>
-                            <input type="hidden" id="selectedTime" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">เบอร์โทรศัพท์ติดต่อ</label>
-                            <input type="tel" id="phoneNumber" class="form-control" placeholder="08XXXXXXXX" required pattern="[0-9]{10}">
-                        </div>
-
-                        <button type="submit" id="btnSubmit" class="btn btn-primary w-100">
-                            ยืนยันการจองคิว
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Success Status View -->
-                <div id="statusView" class="status-view text-center">
-                    <div class="queue-box">
-                        <div class="text-muted mb-2">หมายเลขคิวของคุณ</div>
-                        <div class="queue-number" id="qNumber">A-000</div>
-                        <div class="text-success fw-bold mt-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check-circle-fill me-1" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                            </svg> จองคิวสำเร็จ
-                        </div>
-                    </div>
-                    
-                    <div class="text-start p-3 bg-light rounded-4 mb-4">
-                        <div class="mb-1"><strong>บริการ:</strong> <span id="qService"></span></div>
-                        <div class="mb-1"><strong>วันที่:</strong> <span id="qDate"></span></div>
-                        <div><strong>เวลา:</strong> <span id="qTime"></span> น.</div>
-                    </div>
-
-                    <button class="btn btn-outline-primary w-100 fw-bold" style="border-radius: 16px; padding: 13px;" onclick="liff.closeWindow()">ปิดหน้าต่างนี้</button>
-                </div>
-
-                <hr class="mt-4 mb-3">
-                <div class="text-center small text-muted">
-                    Digital Cooperative Management System<br>
-                    <a href="login.html" class="text-decoration-none text-muted" style="font-size: 0.8rem; margin-top: 5px; display: inline-block;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-lock-fill me-1" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
-                        สำหรับเจ้าหน้าที่
-                    </a>
-                </div>
-
-            </div>
+    <div class="construction-card">
+        <div class="icon-box">🚧</div>
+        <div class="title">ระบบอยู่ระหว่างการจัดทำ</div>
+        <div class="desc">
+            ขณะนี้ระบบจองคิวออนไลน์กำลังอยู่ในช่วงเตรียมความพร้อม<br>และรอการอนุมัติเพื่อเปิดใช้งานอย่างเป็นทางการ
+            <br><br>
+            ขออภัยในความไม่สะดวกครับ
         </div>
+        
+        <!-- ซ่อนปุ่มเข้าสู่ระบบเจ้าหน้าที่ไว้เงียบๆ ด้านล่าง เพื่อให้แอดมินเข้าไปดูหลังบ้านได้ -->
+        <a href="login.html" class="text-decoration-none text-muted" style="font-size: 0.8rem; opacity: 0.5;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-lock-fill me-1" viewBox="0 0 16 16"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>สำหรับเจ้าหน้าที่
+        </a>
     </div>
 
-    <script>
-        // CONFIGURATION
-        const SUPABASE_URL = 'https://mimtgrlavzwkjhfvakug.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbXRncmxhdnp3a2poZnZha3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDQxMTUsImV4cCI6MjA5NzA4MDExNX0._csVd8NZjCgzYACeCOPIbXY_NEZ3z9iPFIh2DneGbzQ';
-        const GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyaAFPx3UzxiPzHyXZN2vlbUXzwVbc0MrLMfFkF6TMwPjRx-Pw1Y5-scKnXYXBjVserUw/exec';
-        
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        let currentUser = { userId: 'U12345mock', displayName: 'สมชาย รักเกียรติ', pictureUrl: 'https://ui-avatars.com/api/?name=สมชาย' };
-
-        // Set Date minimum to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('bookingDate').min = today;
-        document.getElementById('bookingDate').value = today;
-
-        async function initializeLiff() {
-            try {
-                // await liff.init({ liffId: 'YOUR_LIFF_ID' });
-                // if (!liff.isLoggedIn()) { liff.login(); return; }
-                // const profile = await liff.getProfile();
-                // currentUser = profile;
-                
-                document.getElementById('userName').textContent = currentUser.displayName;
-                if(currentUser.pictureUrl) document.getElementById('userImg').src = currentUser.pictureUrl;
-            } catch (err) { 
-                console.error(err);
-            }
-        }
-
-        function selectTime(element, time) {
-            document.querySelectorAll('.time-slot').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
-            document.getElementById('selectedTime').value = time;
-        }
-
-        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const time = document.getElementById('selectedTime').value;
-            if(!time) {
-                Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกช่วงเวลาที่ต้องการรับบริการ', 'warning');
-                return;
-            }
-
-            const btnSubmit = document.getElementById('btnSubmit');
-            const service = document.getElementById('serviceType').value;
-            const date = document.getElementById('bookingDate').value;
-            const phone = document.getElementById('phoneNumber').value;
-
-            // Generate Queue Number (Mock)
-            const prefix = service.includes('ฝาก') ? 'A' : service.includes('สินเชื่อ') ? 'B' : 'C';
-            const qNum = `${prefix}-${Math.floor(Math.random() * 900) + 100}`;
-
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = 'กำลังประมวลผล...';
-
-            Swal.fire({
-                title: 'กำลังบันทึกข้อมูล',
-                text: 'กรุณารอสักครู่',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            try {
-                // 1. Save to Supabase
-                const { data, error } = await supabaseClient.from('queues').insert([{
-                    queue_number: qNum,
-                    user_id: currentUser.userId,
-                    user_name: currentUser.displayName,
-                    service_type: service,
-                    booking_date: date,
-                    booking_time: time,
-                    phone_number: phone
-                }]);
-                if (error) throw error;
-
-                // 2. Call GAS to send LINE Push Message
-                await fetch(GAS_WEBHOOK_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'notify_new_queue', userId: currentUser.userId, queueNum: qNum, service: service, datetime: `${date} ${time} น.` })
-                });
-
-                Swal.close();
-                
-                // Show Success
-                document.getElementById('bookingFormView').style.display = 'none';
-                document.getElementById('statusView').style.display = 'block';
-                
-                document.getElementById('qNumber').textContent = qNum;
-                document.getElementById('qService').textContent = service;
-                document.getElementById('qDate').textContent = date;
-                document.getElementById('qTime').textContent = time;
-
-            } catch (error) {
-                Swal.fire('เกิดข้อผิดพลาด', error.message, 'error');
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'ยืนยันการจองคิว';
-            }
-        });
-
-        window.onload = initializeLiff;
-    </script>
 </body>
 </html>
