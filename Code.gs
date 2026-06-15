@@ -3,8 +3,8 @@
  * รับ HTTP POST แบบ no-cors จาก GitHub Pages เพื่อยิง LINE Push Message
  */
 
-const LINE_ACCESS_TOKEN = 'YOUR_LINE_CHANNEL_ACCESS_TOKEN';
-const REVIEW_LIFF_URL = 'https://your-github-username.github.io/repo/review.html'; // URL ของหน้าประเมิน
+const LINE_ACCESS_TOKEN = 'bVC7EPnCFmKsOE8smCV7Idj4mT0swlZ0kOBKq8RMh7lCB1V5s5J2Td3IUHx65jYc4S9TTLsQX1xzZuGT5+Spa6ZLFZ5rWHtd/NJKe+WhyPD8HuiD/SmF8YTFJSyULqMBTKkroTw7gTt3c29tluEvlQdB04t89/1O/w1cDnyilFU=';
+const REVIEW_LIFF_URL = 'https://pharmacisttom.github.io/qrygcoop/review.html'; // URL ของหน้าประเมิน
 
 function doPost(e) {
   try {
