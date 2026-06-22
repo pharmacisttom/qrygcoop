@@ -298,7 +298,10 @@
                 return;
             }
 
-            const btnSubmit = document.getElementById('btnSubmit');
+            const btn = document.getElementById('btnSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...';
+
             const service = document.getElementById('serviceType').value;
             const date = document.getElementById('bookingDate').value;
             const phone = document.getElementById('phoneNumber').value;
