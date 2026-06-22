@@ -206,7 +206,7 @@
             try {
                 await liff.init({ liffId: '2010466037-2FQbMDY5' });
                 if (!liff.isLoggedIn()) { 
-                    liff.login(); 
+                    liff.login({ redirectUri: window.location.href }); 
                     return; 
                 }
                 currentUser = await liff.getProfile();
@@ -218,7 +218,8 @@
 
         // รับ queue_id จาก URL Parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const queueId = urlParams.get('queue_id') || null;
+        const queueIdParam = urlParams.get('queue_id');
+        const queueId = (queueIdParam && queueIdParam !== 'null') ? parseInt(queueIdParam) : null;
 
         document.getElementById('reviewForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -234,6 +235,11 @@
                 return;
             }
 
+            if (!currentUser || !currentUser.userId) {
+                Swal.fire('ข้อผิดพลาด', 'ไม่พบข้อมูลผู้ใช้ LINE กรุณาโหลดหน้าเว็บใหม่อีกครั้ง', 'error');
+                return;
+            }
+
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true;
             btnSubmit.innerText = 'กำลังส่งข้อมูล...';
@@ -243,9 +249,9 @@
                 const { error } = await supabaseClient.from('reviews').insert([{
                     queue_id: queueId,
                     user_id: currentUser.userId,
-                    rating_speed: q1.value,
-                    rating_service: q2.value,
-                    rating_system: q3.value,
+                    rating_speed: parseInt(q1.value),
+                    rating_service: parseInt(q2.value),
+                    rating_system: parseInt(q3.value),
                     comments: comments
                 }]);
                 if (error) throw error;

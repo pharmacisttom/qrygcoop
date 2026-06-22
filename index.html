@@ -339,7 +339,7 @@
             try {
                 await liff.init({ liffId: '2010466037-2FQbMDY5' });
                 if (!liff.isLoggedIn()) { 
-                    liff.login(); 
+                    liff.login({ redirectUri: window.location.href }); 
                     return; 
                 }
                 currentUser = await liff.getProfile();
