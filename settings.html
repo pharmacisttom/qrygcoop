@@ -105,10 +105,10 @@
             <h5 class="fw-bold mb-0">ระบบจัดการคิว</h5>
             <small id="adminNameDisplay">กำลังตรวจสอบ...</small>
         </div>
-        <a href="admin.html" class="nav-item text-decoration-none text-white d-block" style="opacity: 0.8;">📋 จัดการคิววันนี้</a>
-        <a href="calendar.html" class="nav-item text-decoration-none text-white d-block" style="opacity: 0.8;">📅 ปฏิทินการจอง</a>
-        <a href="dashboard.html" class="nav-item text-decoration-none text-white d-block" style="opacity: 0.8;">📊 ผลประเมิน (Dashboard)</a>
-        <a href="settings.html" class="nav-item active text-decoration-none text-white d-block">⚙️ ตั้งค่าระบบ</a>
+        <a href="admin.html" id="nav-admin" class="nav-item text-decoration-none text-white d-block" style="opacity: 0.8;">📋 จัดการคิววันนี้</a>
+        <a href="calendar.html" id="nav-calendar" class="nav-item text-decoration-none text-white d-block" style="opacity: 0.8;">📅 ปฏิทินการจอง</a>
+        <a href="dashboard.html" id="nav-dashboard" class="nav-item text-decoration-none text-white d-block" style="opacity: 0.8;">📊 ผลประเมิน (Dashboard)</a>
+        <a href="settings.html" id="nav-settings" class="nav-item active text-decoration-none text-white d-block">⚙️ ตั้งค่าระบบ</a>
         
         <div class="mt-auto text-center">
             <button class="btn btn-sm btn-outline-light w-100 mb-3" onclick="logout()" style="border-radius: 12px; font-weight: 500;">
@@ -120,29 +120,73 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h3 class="fw-bold text-primary mb-1">ตั้งค่าช่วงเวลาการจองคิว</h3>
-                <div class="text-muted">กำหนดเวลาและจำนวนจำกัดคิวสูงสุดในแต่ละช่วงเวลา</div>
-            </div>
-            <button class="btn btn-primary fw-bold" onclick="showAddTimeModal()">+ เพิ่มช่วงเวลาใหม่</button>
-        </div>
+        <!-- Tabs -->
+        <ul class="nav nav-pills mb-4" id="settingsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold" id="time-tab" data-bs-toggle="tab" data-bs-target="#time-slots" type="button" role="tab">⏱️ ตั้งค่าเวลาจองคิว</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold" id="users-tab" data-bs-toggle="tab" data-bs-target="#user-mgmt" type="button" role="tab">👤 จัดการผู้ใช้งาน (เจ้าหน้าที่)</button>
+            </li>
+        </ul>
 
-        <div class="card p-4">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>เวลา</th>
-                            <th>จำนวนรับคิวสูงสุด / วัน</th>
-                            <th>สถานะการเปิดรับจอง</th>
-                            <th>จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="slotsTableBody">
-                        <tr><td colspan="4" class="text-center text-muted">กำลังโหลดข้อมูล...</td></tr>
-                    </tbody>
-                </table>
+        <div class="tab-content" id="settingsTabsContent">
+            <!-- Tab 1: Time Slots -->
+            <div class="tab-pane fade show active" id="time-slots" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold text-primary mb-1">ช่วงเวลาการจองคิว</h4>
+                        <div class="text-muted">กำหนดเวลาและจำนวนจำกัดคิวสูงสุดในแต่ละช่วงเวลา</div>
+                    </div>
+                    <button class="btn btn-primary fw-bold" onclick="showAddTimeModal()">+ เพิ่มช่วงเวลาใหม่</button>
+                </div>
+
+                <div class="card p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>เวลา</th>
+                                    <th>จำนวนรับคิวสูงสุด / วัน</th>
+                                    <th>สถานะการเปิดรับจอง</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slotsTableBody">
+                                <tr><td colspan="4" class="text-center text-muted">กำลังโหลดข้อมูล...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: User Management -->
+            <div class="tab-pane fade" id="user-mgmt" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold text-primary mb-1">บัญชีผู้ใช้งานระบบ</h4>
+                        <div class="text-muted">จัดการเจ้าหน้าที่และกำหนดสิทธิ์เข้าถึงเมนูต่างๆ</div>
+                    </div>
+                    <button class="btn btn-success fw-bold" onclick="showAddUserModal()">+ เพิ่มผู้ใช้งานใหม่</button>
+                </div>
+
+                <div class="card p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ชื่อเข้าสู่ระบบ (Username)</th>
+                                    <th>ชื่อ-นามสกุล</th>
+                                    <th>สิทธิ์การใช้งาน</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="4" class="text-center text-muted">กำลังโหลดข้อมูล...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -178,6 +222,56 @@
         </div>
     </div>
 
+    <!-- Modal เพิ่ม/แก้ไขผู้ใช้งาน -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="userModalTitle">เพิ่มผู้ใช้งานใหม่</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="userId">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ชื่อ-นามสกุล</label>
+                        <input type="text" id="userFullName" class="form-control" placeholder="เช่น นายสมหมาย ใจดี" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ชื่อเข้าสู่ระบบ (Username)</label>
+                        <input type="text" id="userUsername" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">รหัสผ่าน</label>
+                        <input type="text" id="userPassword" class="form-control" placeholder="ปล่อยว่างหากไม่ต้องการเปลี่ยนรหัส">
+                    </div>
+                    
+                    <hr>
+                    <label class="form-label fw-bold mb-2">กำหนดสิทธิ์การใช้งาน</label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="permQueues" checked>
+                        <label class="form-check-label" for="permQueues">จัดการคิววันนี้ (Admin)</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="permCalendar" checked>
+                        <label class="form-check-label" for="permCalendar">ดูปฏิทินการจอง (Calendar)</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="permDashboard" checked>
+                        <label class="form-check-label" for="permDashboard">ดูผลประเมิน (Dashboard)</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="permSettings" checked>
+                        <label class="form-check-label" for="permSettings">ตั้งค่าระบบ (Settings)</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-success" onclick="saveUser()">บันทึกข้อมูล</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS (for modal) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -187,14 +281,29 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let timeSlotModal;
+        let userModal;
 
         // เช็ค Session
+        let currentAdmin = null;
         const sessionStr = localStorage.getItem('admin_session');
         if (!sessionStr) {
             window.location.href = 'login.html';
         } else {
-            const session = JSON.parse(sessionStr);
-            document.getElementById('adminNameDisplay').innerText = 'เจ้าหน้าที่: ' + session.fullname;
+            currentAdmin = JSON.parse(sessionStr);
+            document.getElementById('adminNameDisplay').innerText = 'เจ้าหน้าที่: ' + currentAdmin.fullname;
+            
+            // Check Permissions
+            if(currentAdmin.permissions && !currentAdmin.permissions.manage_settings) {
+                alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+                window.location.href = 'admin.html';
+            }
+
+            // ซ่อนเมนูที่ไม่มีสิทธิ์
+            const p = currentAdmin.permissions || {};
+            if(!p.manage_queues) document.getElementById('nav-admin').style.display = 'none';
+            if(!p.view_calendar) document.getElementById('nav-calendar').style.display = 'none';
+            if(!p.view_dashboard) document.getElementById('nav-dashboard').style.display = 'none';
+            if(!p.manage_settings) document.getElementById('nav-settings').style.display = 'none';
         }
 
         function logout() {
@@ -204,7 +313,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             timeSlotModal = new bootstrap.Modal(document.getElementById('timeSlotModal'));
+            userModal = new bootstrap.Modal(document.getElementById('userModal'));
             loadTimeSlots();
+            loadUsers();
         });
 
         async function loadTimeSlots() {
@@ -320,6 +431,151 @@
                     await supabaseClient.from('time_slots').delete().eq('id', id);
                     Swal.fire('ลบสำเร็จ!', '', 'success');
                     loadTimeSlots();
+                }
+            });
+        }
+
+        // ======================================
+        // USER MANAGEMENT
+        // ======================================
+        async function loadUsers() {
+            const { data, error } = await supabaseClient.from('staff_users').select('id, username, fullname, permissions').order('id', { ascending: true });
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(user => {
+                const p = user.permissions || {};
+                let badges = [];
+                if(p.manage_queues) badges.push('<span class="badge bg-primary">จัดการคิว</span>');
+                if(p.view_calendar) badges.push('<span class="badge bg-info text-dark">ปฏิทิน</span>');
+                if(p.view_dashboard) badges.push('<span class="badge bg-warning text-dark">ประเมิน</span>');
+                if(p.manage_settings) badges.push('<span class="badge bg-secondary">ตั้งค่า</span>');
+                
+                const badgeHtml = badges.length > 0 ? badges.join(' ') : '<span class="badge bg-light text-muted">ไม่มีสิทธิ์</span>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${user.username}</td>
+                    <td>${user.fullname}</td>
+                    <td>${badgeHtml}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary me-2" onclick='showEditUserModal(${JSON.stringify(user)})'>แก้ไข</button>
+                        ${user.username !== 'admin' ? `<button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id}, '${user.username}')">ลบ</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showAddUserModal() {
+            document.getElementById('userModalTitle').innerText = 'เพิ่มผู้ใช้งานใหม่';
+            document.getElementById('userId').value = '';
+            document.getElementById('userFullName').value = '';
+            document.getElementById('userUsername').value = '';
+            document.getElementById('userUsername').readOnly = false;
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userPassword').placeholder = "ตั้งรหัสผ่านใหม่";
+            
+            document.getElementById('permQueues').checked = true;
+            document.getElementById('permCalendar').checked = true;
+            document.getElementById('permDashboard').checked = true;
+            document.getElementById('permSettings').checked = true;
+            
+            userModal.show();
+        }
+
+        function showEditUserModal(user) {
+            document.getElementById('userModalTitle').innerText = 'แก้ไขผู้ใช้งาน';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('userFullName').value = user.fullname;
+            document.getElementById('userUsername').value = user.username;
+            document.getElementById('userUsername').readOnly = true; // ห้ามแก้ username
+            document.getElementById('userPassword').value = '';
+            document.getElementById('userPassword').placeholder = "ปล่อยว่างถ้าไม่ต้องการเปลี่ยนรหัส";
+            
+            const p = user.permissions || {};
+            document.getElementById('permQueues').checked = !!p.manage_queues;
+            document.getElementById('permCalendar').checked = !!p.view_calendar;
+            document.getElementById('permDashboard').checked = !!p.view_dashboard;
+            document.getElementById('permSettings').checked = !!p.manage_settings;
+            
+            userModal.show();
+        }
+
+        async function saveUser() {
+            const id = document.getElementById('userId').value;
+            const fullname = document.getElementById('userFullName').value;
+            const username = document.getElementById('userUsername').value;
+            const password = document.getElementById('userPassword').value;
+            
+            const permissions = {
+                manage_queues: document.getElementById('permQueues').checked,
+                view_calendar: document.getElementById('permCalendar').checked,
+                view_dashboard: document.getElementById('permDashboard').checked,
+                manage_settings: document.getElementById('permSettings').checked
+            };
+
+            if (!fullname || !username) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและ Username ให้ครบ', 'warning');
+                return;
+            }
+
+            if (!id && !password) {
+                Swal.fire('ข้อมูลไม่ครบ', 'กรุณาตั้งรหัสผ่านสำหรับผู้ใช้ใหม่', 'warning');
+                return;
+            }
+
+            Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+            let payload = {
+                fullname: fullname,
+                permissions: permissions
+            };
+
+            if (password) {
+                payload.password_hash = password; // ในระบบจริงควร Hash รหัสผ่าน แต่ในที่นี้เก็บตรงไปก่อน
+            }
+
+            try {
+                if (id) {
+                    // Update
+                    const { error } = await supabaseClient.from('staff_users').update(payload).eq('id', id);
+                    if (error) throw error;
+                } else {
+                    // Insert
+                    payload.username = username;
+                    const { error } = await supabaseClient.from('staff_users').insert([payload]);
+                    if (error) throw error;
+                }
+                
+                userModal.hide();
+                Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ', timer: 1500, showConfirmButton: false });
+                loadUsers();
+            } catch (err) {
+                console.error(err);
+                Swal.fire('เกิดข้อผิดพลาด', 'อาจมี Username นี้อยู่ในระบบแล้ว', 'error');
+            }
+        }
+
+        async function deleteUser(id, username) {
+            Swal.fire({
+                title: `ลบผู้ใช้ ${username}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'ใช่, ลบเลย!',
+                cancelButtonText: 'ยกเลิก'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await supabaseClient.from('staff_users').delete().eq('id', id);
+                    Swal.fire('ลบสำเร็จ!', '', 'success');
+                    loadUsers();
                 }
             });
         }

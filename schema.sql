@@ -46,15 +46,19 @@ CREATE TABLE staff_users (
     password_hash VARCHAR(100) NOT NULL,
     fullname VARCHAR(100) NOT NULL,
     role VARCHAR(20) DEFAULT 'admin',
+    permissions JSONB DEFAULT '{"manage_queues":true, "view_calendar":true, "view_dashboard":true, "manage_settings":true}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 ALTER TABLE staff_users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read staff_users" ON staff_users FOR SELECT USING (true);
+CREATE POLICY "Allow update for staff_users" ON staff_users FOR UPDATE USING (true);
+CREATE POLICY "Allow insert for staff_users" ON staff_users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow delete for staff_users" ON staff_users FOR DELETE USING (true);
 
 -- เพิ่มข้อมูลจำลองสำหรับแอดมิน (รหัสผ่าน: admin1234)
-INSERT INTO staff_users (username, password_hash, fullname, role) 
-VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบสูงสุด', 'admin')
+INSERT INTO staff_users (username, password_hash, fullname, role, permissions) 
+VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบสูงสุด', 'admin', '{"manage_queues":true, "view_calendar":true, "view_dashboard":true, "manage_settings":true}'::jsonb)
 ON CONFLICT (username) DO NOTHING;
 
 -- =====================================

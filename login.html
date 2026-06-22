@@ -144,7 +144,7 @@
                 // ค้นหาผู้ใช้ใน Supabase (ใช้ตาราง staff_users)
                 const { data, error } = await supabaseClient
                     .from('staff_users')
-                    .select('*')
+                    .select('id, username, fullname, role, permissions')
                     .eq('username', username)
                     .eq('password', password)
                     .single();
@@ -157,12 +157,19 @@
                     });
                 } else {
                     // สร้าง Session (เก็บลง localStorage)
-                    const sessionData = {
+                    localStorage.setItem('admin_session', JSON.stringify({
+                        id: data.id,
                         username: data.username,
                         fullname: data.fullname,
+                        role: data.role,
+                        permissions: data.permissions || {
+                            manage_queues: true,
+                            view_calendar: true,
+                            view_dashboard: true,
+                            manage_settings: true
+                        },
                         login_time: new Date().getTime()
-                    };
-                    localStorage.setItem('admin_session', JSON.stringify(sessionData));
+                    }));
 
                     Swal.fire({
                         icon: 'success',
