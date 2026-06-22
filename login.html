@@ -146,7 +146,7 @@
                     .from('staff_users')
                     .select('id, username, fullname, role, permissions')
                     .eq('username', username)
-                    .eq('password', password)
+                    .eq('password_hash', password)
                     .single();
 
                 if (error || !data) {
