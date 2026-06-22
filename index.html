@@ -95,6 +95,14 @@
             box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
         }
 
+        .time-slot.disabled {
+            background-color: #e9ecef;
+            color: #adb5bd;
+            border-color: #e9ecef;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .profile-badge {
             background: #f8fafc;
             border: 1px solid #dbe4ef;
@@ -196,15 +204,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">ช่วงเวลา (รอบละ 30 นาที)</label>
                             <div class="time-slots" id="timeSlots">
-                                <div class="time-slot" onclick="selectTime(this, '09:00')">09:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '09:30')">09:30</div>
-                                <div class="time-slot" onclick="selectTime(this, '10:00')">10:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '10:30')">10:30</div>
-                                <div class="time-slot" onclick="selectTime(this, '11:00')">11:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '13:00')">13:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '13:30')">13:30</div>
-                                <div class="time-slot" onclick="selectTime(this, '14:00')">14:00</div>
-                                <div class="time-slot" onclick="selectTime(this, '14:30')">14:30</div>
+                                <div class="text-center w-100 text-muted">กำลังโหลดช่วงเวลา...</div>
                             </div>
                             <input type="hidden" id="selectedTime" required>
                         </div>
@@ -281,7 +281,61 @@
         document.getElementById('bookingDate').min = today;
         document.getElementById('bookingDate').value = today;
 
+        async function fetchAvailableSlots(date) {
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            timeSlotsContainer.innerHTML = '<div class="text-center w-100 mt-3"><span class="spinner-border spinner-border-sm text-primary"></span> กำลังตรวจสอบคิวว่าง...</div>';
+            document.getElementById('selectedTime').value = '';
+            
+            try {
+                // 1. Get active time slots from admin config
+                const { data: slotsData, error: slotsErr } = await supabaseClient.from('time_slots').select('*').eq('is_active', true).order('time_string', { ascending: true });
+                if (slotsErr) throw slotsErr;
+                
+                // 2. Get current bookings for the selected date (status != 'CANCELLED')
+                const { data: queuesData, error: queuesErr } = await supabaseClient.from('queues').select('booking_time').eq('booking_date', date).neq('status', 'CANCELLED');
+                if (queuesErr) throw queuesErr;
+
+                // 3. Count bookings per slot
+                const bookingCounts = {};
+                queuesData.forEach(q => {
+                    bookingCounts[q.booking_time] = (bookingCounts[q.booking_time] || 0) + 1;
+                });
+
+                // 4. Render slots
+                timeSlotsContainer.innerHTML = '';
+                if(slotsData.length === 0) {
+                    timeSlotsContainer.innerHTML = '<div class="text-danger w-100 text-center">แอดมินยังไม่เปิดรับคิวในขณะนี้</div>';
+                    return;
+                }
+
+                slotsData.forEach(slot => {
+                    const count = bookingCounts[slot.time_string] || 0;
+                    const available = slot.max_capacity - count;
+                    const isFull = available <= 0;
+                    
+                    const div = document.createElement('div');
+                    div.className = `time-slot ${isFull ? 'disabled' : ''}`;
+                    div.innerHTML = `<div class="fw-bold">${slot.time_string}</div><div style="font-size: 0.75rem; margin-top: 2px;">${isFull ? 'เต็มแล้ว' : 'ว่าง ' + available + ' คิว'}</div>`;
+                    
+                    if(!isFull) {
+                        div.onclick = function() { selectTime(this, slot.time_string); };
+                    }
+                    timeSlotsContainer.appendChild(div);
+                });
+
+            } catch (err) {
+                console.error(err);
+                timeSlotsContainer.innerHTML = '<div class="text-danger w-100 text-center">เกิดข้อผิดพลาดในการโหลดช่วงเวลา</div>';
+            }
+        }
+
+        // เมื่อเปลี่ยนวันที่ ให้ดึงคิวใหม่
+        document.getElementById('bookingDate').addEventListener('change', function() {
+            fetchAvailableSlots(this.value);
+        });
+
         async function initializeLiff() {
+            fetchAvailableSlots(document.getElementById('bookingDate').value); // โหลดช่วงเวลาตอนเริ่มต้น
             try {
                 await liff.init({ liffId: '2010466037-2FQbMDY5' });
                 if (!liff.isLoggedIn()) { 

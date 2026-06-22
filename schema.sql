@@ -1,66 +1,86 @@
--- สคริปต์สำหรับสร้างฐานข้อมูลระบบจองคิวบน Supabase (นำไปรันใน SQL Editor ของ Supabase)
-
--- ลบตารางเดิมและ policy เดิมออกก่อน (เผื่อมีการรันสคริปต์ซ้ำ)
-DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS queues CASCADE;
-DROP TABLE IF EXISTS staff_users CASCADE;
-
--- 0. สร้างตารางเก็บรหัสผ่านเจ้าหน้าที่
-CREATE TABLE staff_users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(100) NOT NULL, -- เก็บเป็น Plain text สำหรับทดสอบ
-    fullname VARCHAR(150) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- ใส่ข้อมูลตั้งต้นสำหรับแอดมิน (admin / admin1234)
-INSERT INTO staff_users (username, password, fullname) VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบ');
-
--- เปิดใช้งาน RLS สำหรับตาราง staff_users
-ALTER TABLE staff_users ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow anonymous select for staff_users" ON staff_users FOR SELECT USING (true);
-
-
--- 1. สร้างตารางเก็บรายการคิว (Queues)
+-- =====================================
+-- 1. Table: queues (ข้อมูลการจองคิว)
+-- =====================================
 CREATE TABLE queues (
     id SERIAL PRIMARY KEY,
-    queue_number VARCHAR(20) NOT NULL,
-    user_id VARCHAR(100) NOT NULL, -- LINE User ID
-    user_name VARCHAR(150),
+    queue_number VARCHAR(10) NOT NULL,
+    user_id VARCHAR(100) NOT NULL,
+    user_name VARCHAR(100) NOT NULL,
     service_type VARCHAR(50) NOT NULL,
     booking_date DATE NOT NULL,
-    booking_time VARCHAR(20) NOT NULL,
-    phone_number VARCHAR(20),
+    booking_time VARCHAR(10) NOT NULL,
+    phone_number VARCHAR(15),
     status VARCHAR(20) DEFAULT 'WAITING', -- WAITING, CALLING, DONE, CANCELLED
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. สร้างตารางเก็บผลประเมินความพึงพอใจ (Reviews)
+ALTER TABLE queues ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public insert for queues" ON queues FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public read queues" ON queues FOR SELECT USING (true);
+CREATE POLICY "Allow update for queues" ON queues FOR UPDATE USING (true);
+
+-- =====================================
+-- 2. Table: reviews (ข้อมูลแบบประเมิน)
+-- =====================================
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
-    queue_id INTEGER REFERENCES queues(id),
+    queue_id INT REFERENCES queues(id) ON DELETE SET NULL,
     user_id VARCHAR(100) NOT NULL,
-    rating_speed INTEGER NOT NULL CHECK (rating_speed >= 1 AND rating_speed <= 5),
-    rating_service INTEGER NOT NULL CHECK (rating_service >= 1 AND rating_service <= 5),
-    rating_system INTEGER NOT NULL CHECK (rating_system >= 1 AND rating_system <= 5),
+    rating_speed INT NOT NULL,
+    rating_service INT NOT NULL,
+    rating_system INT NOT NULL,
     comments TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. เปิดใช้งาน Row Level Security (RLS) เพื่อความปลอดภัย
-ALTER TABLE queues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public insert for reviews" ON reviews FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public read reviews" ON reviews FOR SELECT USING (true);
 
--- 4. สร้าง Policies (นโยบายการเข้าถึงข้อมูล) แบบง่ายสำหรับการพัฒนาเริ่มต้น
--- อนุญาตให้เพิ่มข้อมูล (Insert) ได้ทุกคน (สำหรับการจองคิวผ่าน LIFF)
-CREATE POLICY "Allow anonymous insert for queues" ON queues FOR INSERT WITH CHECK (true);
+-- =====================================
+-- 3. Table: staff_users (ผู้ใช้งานระบบจัดการคิว/เจ้าหน้าที่)
+-- =====================================
+CREATE TABLE staff_users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    fullname VARCHAR(100) NOT NULL,
+    role VARCHAR(20) DEFAULT 'admin',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
--- อนุญาตให้อ่านข้อมูล (Select) ได้ทุกคน (สำหรับการแสดงผลหน้า Admin)
-CREATE POLICY "Allow anonymous select for queues" ON queues FOR SELECT USING (true);
+ALTER TABLE staff_users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read staff_users" ON staff_users FOR SELECT USING (true);
 
--- อนุญาตให้อัปเดตข้อมูล (Update) ได้ทุกคน (สำหรับการเรียกคิว/ปิดงาน)
-CREATE POLICY "Allow anonymous update for queues" ON queues FOR UPDATE USING (true);
+-- เพิ่มข้อมูลจำลองสำหรับแอดมิน (รหัสผ่าน: admin1234)
+INSERT INTO staff_users (username, password_hash, fullname, role) 
+VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบสูงสุด', 'admin')
+ON CONFLICT (username) DO NOTHING;
 
--- อนุญาตให้เพิ่มผลประเมินได้ทุกคน
-CREATE POLICY "Allow anonymous insert for reviews" ON reviews FOR INSERT WITH CHECK (true);
+-- =====================================
+-- 4. Table: time_slots (การตั้งค่าช่วงเวลาและการจำกัดคิว)
+-- =====================================
+CREATE TABLE time_slots (
+    id SERIAL PRIMARY KEY,
+    time_string VARCHAR(10) UNIQUE NOT NULL,
+    max_capacity INT NOT NULL DEFAULT 5,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE time_slots ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read time_slots" ON time_slots FOR SELECT USING (true);
+CREATE POLICY "Allow public update time_slots" ON time_slots FOR ALL USING (true);
+
+-- เพิ่มข้อมูลเวลาพื้นฐานตอนเริ่มต้น
+INSERT INTO time_slots (time_string, max_capacity, is_active) VALUES
+('09:00', 5, true),
+('09:30', 5, true),
+('10:00', 5, true),
+('10:30', 5, true),
+('11:00', 5, true),
+('13:00', 5, true),
+('13:30', 5, true),
+('14:00', 5, true),
+('14:30', 5, true)
+ON CONFLICT (time_string) DO NOTHING;
