@@ -131,9 +131,28 @@
             color: #0d6efd;
             line-height: 1;
         }
+        .test-banner {
+            background-color: #dc3545;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
-<body>
+<body style="padding-top: 40px;">
+
+    <!-- ป้ายประกาศทดสอบระบบ -->
+    <div class="test-banner">
+        🚧 ระบบนี้กำลังอยู่ในช่วงทดสอบ (Test Mode) ยังไม่ได้เปิดใช้งานจริง
+    </div>
 
     <div class="container px-3">
         <div class="card main-card mx-auto" id="appCard">
@@ -273,16 +292,6 @@
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // --- ระบบระงับการจองชั่วคราว ---
-            Swal.fire({
-                icon: 'info',
-                title: 'ระบบยังไม่เปิดให้บริการ',
-                text: 'ขณะนี้ระบบจองคิวกำลังอยู่ในช่วงเตรียมความพร้อมและรอการอนุมัติ ขออภัยในความไม่สะดวกครับ',
-                confirmButtonText: 'รับทราบ'
-            });
-            return;
-            // -----------------------------
-
             const time = document.getElementById('selectedTime').value;
             if(!time) {
                 Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกช่วงเวลาที่ต้องการรับบริการ', 'warning');
