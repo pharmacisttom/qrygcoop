@@ -144,9 +144,9 @@
                 // ค้นหาผู้ใช้ใน Supabase (ใช้ตาราง staff_users)
                 const { data, error } = await supabaseClient
                     .from('staff_users')
-                    .select('id, username, fullname, role, permissions')
+                    .select('id, username, fullname, permissions')
                     .eq('username', username)
-                    .eq('password_hash', password)
+                    .eq('password', password)
                     .single();
 
                 if (error) {
@@ -176,7 +176,6 @@
                         id: data.id,
                         username: data.username,
                         fullname: data.fullname,
-                        role: data.role,
                         permissions: data.permissions || {
                             manage_queues: true,
                             view_calendar: true,

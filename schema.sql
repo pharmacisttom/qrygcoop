@@ -38,16 +38,15 @@ CREATE POLICY "Allow public insert for reviews" ON reviews FOR INSERT WITH CHECK
 CREATE POLICY "Allow public read reviews" ON reviews FOR SELECT USING (true);
 
 -- =====================================
--- 3. Table: staff_users (ผู้ใช้งานระบบจัดการคิว/เจ้าหน้าที่)
+-- 3. Table: staff_users (ข้อมูลเจ้าหน้าที่)
 -- =====================================
 CREATE TABLE staff_users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     fullname VARCHAR(100) NOT NULL,
-    role VARCHAR(20) DEFAULT 'admin',
     permissions JSONB DEFAULT '{"manage_queues":true, "view_calendar":true, "view_dashboard":true, "manage_settings":true}'::jsonb,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
 ALTER TABLE staff_users ENABLE ROW LEVEL SECURITY;
@@ -56,9 +55,9 @@ CREATE POLICY "Allow update for staff_users" ON staff_users FOR UPDATE USING (tr
 CREATE POLICY "Allow insert for staff_users" ON staff_users FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow delete for staff_users" ON staff_users FOR DELETE USING (true);
 
--- เพิ่มข้อมูลจำลองสำหรับแอดมิน (รหัสผ่าน: admin1234)
-INSERT INTO staff_users (username, password_hash, fullname, role, permissions) 
-VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบสูงสุด', 'admin', '{"manage_queues":true, "view_calendar":true, "view_dashboard":true, "manage_settings":true}'::jsonb)
+-- สร้างผู้ใช้ admin หลัก (รหัสผ่านเริ่มต้น: admin1234)
+INSERT INTO staff_users (username, password, fullname, permissions) 
+VALUES ('admin', 'admin1234', 'ผู้ดูแลระบบสูงสุด', '{"manage_queues":true, "view_calendar":true, "view_dashboard":true, "manage_settings":true}'::jsonb)
 ON CONFLICT (username) DO NOTHING;
 
 -- =====================================
