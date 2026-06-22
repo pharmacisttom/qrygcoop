@@ -176,7 +176,7 @@
                     </div>
                     <h3 class="fw-bold text-success">ขอบคุณสำหรับคำติชม</h3>
                     <p class="text-muted">ข้อมูลของท่านจะนำไปใช้ในการพัฒนาการให้บริการต่อไป</p>
-                    <button class="btn btn-outline-success w-100 fw-bold mt-4" style="border-radius: 16px; padding: 13px;" onclick="liff.closeWindow()">ปิดหน้าต่างนี้</button>
+                    <button class="btn btn-outline-success w-100 fw-bold mt-4" style="border-radius: 16px; padding: 13px;" onclick="closeApp()">ปิดหน้าต่างนี้</button>
                 </div>
 
             </div>
@@ -189,6 +189,18 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentUser = { userId: 'U12345mock' };
+
+        function closeApp() {
+            try {
+                if(typeof liff !== 'undefined' && liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    window.location.reload(); // รีเฟรชหน้าเว็บแทนถ้าเปิดในเบราว์เซอร์ปกติ
+                }
+            } catch(e) {
+                window.location.reload();
+            }
+        }
         
         // รับ queue_id จาก URL Parameters
         const urlParams = new URLSearchParams(window.location.search);

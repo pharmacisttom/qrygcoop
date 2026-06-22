@@ -238,7 +238,7 @@
                         <div><strong>เวลา:</strong> <span id="qTime"></span> น.</div>
                     </div>
 
-                    <button class="btn btn-outline-primary w-100 fw-bold" style="border-radius: 16px; padding: 13px;" onclick="liff.closeWindow()">ปิดหน้าต่างนี้</button>
+                    <button class="btn btn-outline-primary w-100 fw-bold" style="border-radius: 16px; padding: 13px;" onclick="closeApp()">ปิดหน้าต่างนี้</button>
                 </div>
 
                 <hr class="mt-4 mb-3">
@@ -263,6 +263,18 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentUser = { userId: 'U12345mock', displayName: 'สมชาย รักเกียรติ', pictureUrl: 'https://ui-avatars.com/api/?name=สมชาย' };
+
+        function closeApp() {
+            try {
+                if(typeof liff !== 'undefined' && liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    window.location.reload(); // รีเฟรชหน้าเว็บแทนถ้าเปิดในเบราว์เซอร์ปกติ
+                }
+            } catch(e) {
+                window.location.reload();
+            }
+        }
 
         // Set Date minimum to today
         const today = new Date().toISOString().split('T')[0];
