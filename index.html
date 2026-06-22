@@ -262,7 +262,7 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        let currentUser = { userId: 'U12345mock', displayName: 'สมชาย รักเกียรติ', pictureUrl: 'https://ui-avatars.com/api/?name=สมชาย' };
+        let currentUser = {};
 
         function closeApp() {
             try {
@@ -283,15 +283,18 @@
 
         async function initializeLiff() {
             try {
-                // await liff.init({ liffId: 'YOUR_LIFF_ID' });
-                // if (!liff.isLoggedIn()) { liff.login(); return; }
-                // const profile = await liff.getProfile();
-                // currentUser = profile;
+                await liff.init({ liffId: '2010466037-2FQbMDY5' });
+                if (!liff.isLoggedIn()) { 
+                    liff.login(); 
+                    return; 
+                }
+                currentUser = await liff.getProfile();
                 
                 document.getElementById('userName').textContent = currentUser.displayName;
                 if(currentUser.pictureUrl) document.getElementById('userImg').src = currentUser.pictureUrl;
             } catch (err) { 
                 console.error(err);
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาเปิดลิงก์นี้ผ่านแอป LINE', 'error');
             }
         }
 

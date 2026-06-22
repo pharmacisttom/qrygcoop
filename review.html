@@ -188,7 +188,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pbXRncmxhdnp3a2poZnZha3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDQxMTUsImV4cCI6MjA5NzA4MDExNX0._csVd8NZjCgzYACeCOPIbXY_NEZ3z9iPFIh2DneGbzQ';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        let currentUser = { userId: 'U12345mock' };
+        let currentUser = {};
 
         function closeApp() {
             try {
@@ -202,6 +202,20 @@
             }
         }
         
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: '2010466037-2FQbMDY5' });
+                if (!liff.isLoggedIn()) { 
+                    liff.login(); 
+                    return; 
+                }
+                currentUser = await liff.getProfile();
+            } catch (err) { 
+                console.error(err);
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาเปิดลิงก์นี้ผ่านแอป LINE', 'error');
+            }
+        }
+
         // รับ queue_id จาก URL Parameters
         const urlParams = new URLSearchParams(window.location.search);
         const queueId = urlParams.get('queue_id') || null;
@@ -245,6 +259,8 @@
                 btnSubmit.innerText = 'ส่งแบบประเมิน';
             }
         });
+
+        window.onload = initializeLiff;
     </script>
 </body>
 </html>
