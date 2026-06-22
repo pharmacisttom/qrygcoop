@@ -195,10 +195,17 @@
                 if(typeof liff !== 'undefined' && liff.isInClient()) {
                     liff.closeWindow();
                 } else {
-                    window.location.reload(); // รีเฟรชหน้าเว็บแทนถ้าเปิดในเบราว์เซอร์ปกติ
+                    window.open('', '_self', '');
+                    window.close(); // พยายามปิดแท็บ
+                    
+                    // ถ้ายังปิดไม่ได้ ให้ redirect กลับไปที่แอป LINE
+                    setTimeout(() => {
+                        window.location.href = "line://";
+                    }, 500);
                 }
             } catch(e) {
-                window.location.reload();
+                window.open('', '_self', '');
+                window.close();
             }
         }
         
