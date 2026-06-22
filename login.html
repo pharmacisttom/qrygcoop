@@ -149,7 +149,22 @@
                     .eq('password_hash', password)
                     .single();
 
-                if (error || !data) {
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เข้าสู่ระบบไม่สำเร็จ',
+                            text: 'Username หรือ Password ไม่ถูกต้อง'
+                        });
+                    } else {
+                        console.error("Supabase Error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ยังไม่ได้อัปเดตฐานข้อมูล',
+                            text: 'กรุณานำโค้ด SQL ล่าสุดไปรันใน Supabase ก่อนครับ (' + error.message + ')'
+                        });
+                    }
+                } else if (!data) {
                     Swal.fire({
                         icon: 'error',
                         title: 'เข้าสู่ระบบไม่สำเร็จ',
